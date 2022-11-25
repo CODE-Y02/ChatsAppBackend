@@ -48,7 +48,7 @@ const signUp = async (req, res, next) => {
           })
           .catch((error) => {
             // console.log(error);
-            return res.status(409).json({
+            return res.status(403).json({
               success: false,
               error: error.message,
               message: " User Already exist ",
