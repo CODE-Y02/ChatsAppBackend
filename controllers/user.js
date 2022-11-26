@@ -3,6 +3,14 @@ const User = require("../models/user");
 const { Op } = require("sequelize");
 const bcrypt = require("bcrypt");
 
+const dotenv = require("dotenv");
+
+// get config vars
+dotenv.config();
+
+// jwt
+const jwt = require("jsonwebtoken");
+
 const signUp = async (req, res, next) => {
   try {
     const { name, email, phone, password } = req.body;
@@ -68,6 +76,64 @@ const signUp = async (req, res, next) => {
   }
 };
 
+// login in
+const logIn = async (req, res) => {
+  try {
+    // get user info from req
+    const { email, password } = req.body;
+
+    // check user exist or not
+    let user = await User.findAll({
+      where: { email: email },
+    });
+
+    if (user.length == 0) {
+      return res
+        .status(404)
+        .json({
+          success: false,
+          message: "You are Not Registered ! signUp ☝️",
+          error: " User Not Found",
+        });
+    }
+
+    // get encryped pass
+    const hash = user[0].password;
+
+    // decrypt pass
+    bcrypt.compare(password, hash, function (err, result) {
+      // result == true -->  success login
+      if (err) throw new Error(" Something Went Wrong Try again Later");
+
+      if (result) {
+        // user found , login success
+
+        res.status(200).json({
+          success: true,
+          message: "Login successfull",
+          token: generateAccessToken(user[0].id),
+        });
+      } else {
+        // wrong pass
+        return res.status(401).json({
+          success: false,
+          message: "Wrong password",
+          error: "User not authorized",
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+};
+
+function generateAccessToken(userId) {
+  return jwt.sign({ userId: userId }, process.env.TOKEN_SECRET, {
+    expiresIn: "1h",
+  });
+}
+
 module.exports = {
   signUp,
+  logIn,
 };
