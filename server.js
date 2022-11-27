@@ -12,11 +12,21 @@ app.use(cors());
 
 app.use(express.json()); //body parser
 
+// models import
+const User = require("./models/user");
+const Message = require("./models/message");
+
+// association
+User.hasMany(Message);
+Message.belongsTo(User);
+
 // import routes
 const userRoutes = require("./routes/user");
-
+const messageRoutes = require("./routes/message");
 // user route
 app.use(userRoutes);
+//message route
+app.use("/message", messageRoutes);
 
 // 404
 

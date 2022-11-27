@@ -1,6 +1,6 @@
 const User = require("../models/user");
 
-const { Op } = require("sequelize");
+// const { Op } = require("sequelize");
 const bcrypt = require("bcrypt");
 
 const dotenv = require("dotenv");
@@ -88,13 +88,11 @@ const logIn = async (req, res) => {
     });
 
     if (user.length == 0) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          message: "You are Not Registered ! signUp ☝️",
-          error: " User Not Found",
-        });
+      return res.status(404).json({
+        success: false,
+        message: "You are Not Registered ! signUp ☝️",
+        error: " User Not Found",
+      });
     }
 
     // get encryped pass
@@ -127,6 +125,7 @@ const logIn = async (req, res) => {
   }
 };
 
+// jwt token function
 function generateAccessToken(userId) {
   return jwt.sign({ userId: userId }, process.env.TOKEN_SECRET, {
     expiresIn: "1h",
