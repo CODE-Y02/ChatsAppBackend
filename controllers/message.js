@@ -1,3 +1,5 @@
+const { Op } = require("sequelize");
+
 const Message = require("../models/message");
 const User = require("../models/user");
 
@@ -40,18 +42,33 @@ const saveMsg = async (req, res, next) => {
 
 const getAllmsg = async (req, res, next) => {
   try {
-    // read all message
-    let msgArr = await Message.findAll();
+    // get lastMsg id
+    let lastMsgId = req.query.lastmessageId;
+
+    // console.log("\n\n  messages=====>  \n", lastMsgId, "\n\n");
+
+    if (!lastMsgId && lastMsgId !== 0) {
+      lastMsgId = -1;
+    }
+
+    // read all message where id > lastMsgid
+    let msgArr = await Message.findAll({
+      where: {
+        id: {
+          [Op.gt]: lastMsgId,
+        },
+      },
+    });
 
     // get user name for each msg and clean up response
     msgArr = await msgArr.map(async (each) => {
       let user = await each.getUser();
-      const { createdAt, content, userId, updatedAt } = each;
-      let { name, id } = user;
+      const { createdAt, content, updatedAt, id } = each;
 
-      if (id === req.user.id) name = "you";
+      let name = user.name;
+      if (user.id === req.user.id) name = "you";
 
-      return { content, userId, updatedAt, createdAt, name };
+      return { id, content, updatedAt, createdAt, name };
     });
 
     let messages = await Promise.all(msgArr);
