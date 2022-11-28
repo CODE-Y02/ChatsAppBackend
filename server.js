@@ -38,6 +38,7 @@ app.use("/", (req, res) => {
 const startApp = async () => {
   try {
     await sequelize.sync();
+    // await sequelize.sync({ force: true });
 
     app.listen(process.env.PORT || 3000, () => {
       console.log(

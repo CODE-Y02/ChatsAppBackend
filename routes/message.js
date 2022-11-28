@@ -3,10 +3,10 @@ const router = express.Router();
 
 const { authentication } = require("../middlewares/auth");
 
-const { saveMsg, readMsg } = require("../controllers/message");
+const { saveMsg, getAllmsg } = require("../controllers/message");
 
 router.post("/send", authentication, saveMsg);
 
-router.post("/read", authentication, readMsg);
+router.get("/getall", authentication, getAllmsg);
 
 module.exports = router;
