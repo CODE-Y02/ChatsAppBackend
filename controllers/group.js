@@ -67,7 +67,7 @@ const getUserGroups = async (req, res) => {
   try {
     let groups = await req.user.getGroups();
 
-    console.log("\n\n ===========>\n\n", groups, "\n\n\n");
+    // console.log("\n\n ===========>\n\n", groups, "\n\n\n");
 
     res.json(groups);
   } catch (error) {

@@ -18,13 +18,18 @@ const Message = require("./models/message");
 const Group = require("./models/group");
 const GroupMember = require("./models/groupMembers");
 
-// association
+// Association
+
 User.hasMany(Message);
 Message.belongsTo(User);
 
 // user group relation
 User.belongsToMany(Group, { through: GroupMember });
 Group.belongsToMany(User, { through: GroupMember });
+
+// messager and group relation
+Group.hasMany(Message);
+Message.belongsTo(Group);
 
 // import routes
 const userRoutes = require("./routes/user");
