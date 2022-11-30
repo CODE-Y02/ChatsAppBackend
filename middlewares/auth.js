@@ -28,6 +28,23 @@ const authentication = async (req, res, next) => {
   }
 };
 
+// const isGroupAdminAuth = async (req, res, next) => {
+//   try {
+//     let admin = req.user;
+
+//     let where = req.body.groupId
+//       ? { id: groupId, isAdmin: true, userId: admin.id }
+//       : { };
+//     let group = await admin.getGroups(where);
+
+//     if (!group || group.length === 0) {
+//       return res
+//         .status(400)
+//         .json({ success: false, message: " You are not a admin" });
+//     }
+//   } catch (error) {}
+// };
+
 module.exports = {
   authentication,
 };
