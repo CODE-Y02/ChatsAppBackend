@@ -1,5 +1,4 @@
 //  models import
-const User = require("../models/user");
 const GroupMember = require("../models/groupMembers");
 const Group = require("../models/group");
 const { Op } = require("sequelize");
@@ -243,7 +242,6 @@ const getAdminGroups = async (req, res) => {
     let temp = await groupArr.map((obj) => Group.findByPk(obj.groupId));
 
     let groups = await Promise.all(temp);
-    // console.log("\n\n ===========>\n\n", temp, "\n\n\n");
 
     res.status(200).json(groups);
   } catch (error) {

@@ -1,14 +1,11 @@
 const { Op } = require("sequelize");
 
 const Message = require("../models/message");
-const User = require("../models/user");
 
 // when user send msg
 const saveMsg = async (req, res, next) => {
   try {
     const { message, groupId } = req.body;
-
-    // console.log(req.body);
 
     if (message === "") {
       //message cannot be null
@@ -44,7 +41,7 @@ const saveMsg = async (req, res, next) => {
     res.status(500).json({
       success: false,
       message: `Internal Server Error`,
-      error,
+      error: error.message,
     });
   }
 };
@@ -53,8 +50,6 @@ const getAllmsg = async (req, res, next) => {
   try {
     // get lastMsg id
     let lastMsgId = req.query.lastmessageId;
-
-    // console.log("\n\n  messages=====>  \n", lastMsgId, "\n\n");
 
     if (!lastMsgId && lastMsgId !== 0) {
       lastMsgId = -1;
@@ -82,7 +77,7 @@ const getAllmsg = async (req, res, next) => {
     });
 
     let messages = await Promise.all(msgArr);
-    // console.log("\n\n  messages=====>  \n", messages, "\n\n");
+
     res.status(200).json(messages);
   } catch (error) {
     console.log("\n\n error in get ALL msg \n", error, "\n\n");
@@ -100,8 +95,6 @@ const getGroupMsg = async (req, res, next) => {
     let lastMsgId = req.query.lastmessageId;
 
     const groupId = req.params.id;
-
-    console.log("\n\n  messages=====>  \n", groupId, "\n\n");
 
     if (!lastMsgId && lastMsgId !== 0) {
       lastMsgId = -1;
@@ -129,7 +122,7 @@ const getGroupMsg = async (req, res, next) => {
     });
 
     let messages = await Promise.all(msgArr);
-    // console.log("\n\n  messages=====>  \n", messages, "\n\n");
+
     res.status(200).json(messages);
   } catch (error) {
     console.log("\n\n error in get ALL msg \n", error, "\n\n");

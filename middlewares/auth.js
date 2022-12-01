@@ -12,11 +12,9 @@ const User = require("../models/user");
 
 const authentication = async (req, res, next) => {
   try {
-    // console.log("\n\n\n", req.headers, "\n\n\n");
     let token = req.headers.authorization;
 
     const userObj = jwt.verify(token, process.env.TOKEN_SECRET);
-    // console.log("\n \n ", userObj);
 
     let user = await User.findByPk(userObj.userId);
 
