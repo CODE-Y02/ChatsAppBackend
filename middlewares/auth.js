@@ -24,7 +24,7 @@ const authentication = async (req, res, next) => {
     next();
   } catch (error) {
     console.log(" \n ERR in AUTH ", error);
-    return res.status(401).json({ success: false });
+    return res.status(401).json({ success: false, message: "invalid token" });
   }
 };
 
