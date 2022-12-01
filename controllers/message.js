@@ -110,6 +110,7 @@ const getGroupMsg = async (req, res, next) => {
       },
     });
 
+    //
     // get user name for each msg and clean up response
     msgArr = await msgArr.map(async (each) => {
       let user = await each.getUser();
