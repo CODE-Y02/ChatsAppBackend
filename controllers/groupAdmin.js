@@ -1,7 +1,11 @@
+//  models import
 const User = require("../models/user");
-
 const GroupMember = require("../models/groupMembers");
 const Group = require("../models/group");
+const { Op } = require("sequelize");
+
+// helper services
+const { getUsers } = require("../services/userServices");
 
 // create new group with req user as default admin
 const createNewGroup = async (req, res) => {
@@ -35,33 +39,44 @@ const createNewGroup = async (req, res) => {
 // add new member to existing group
 const addNewMemberToGroup = async (req, res) => {
   try {
-    // get memberId & groupId from req
-    const { memberId, groupId } = req.body;
+    //1 get memberId & groupId from req
 
-    // 1 check user is admin of group
-    const admin = await GroupMember.findOne({
-      where: { groupId, userId: req.user.id },
-    });
+    const { groupId, memberInfo } = req.body;
 
-    if (!admin) {
-      // unauthorized
-      return res
-        .status(401)
-        .json({ success: false, message: "You are not a admin of group" });
-    }
+    const where = {
+      [Op.or]: [
+        { name: memberInfo },
+        { email: memberInfo },
+        { phone: memberInfo },
+        { id: memberInfo },
+      ],
+    };
 
     // 2 find member
-    let member = await User.findByPk(memberId);
+    const members = await getUsers({ where });
 
-    if (!member) {
-      // invalid member id or user not found
+    console.log("\n\n\n", members, "\n\n\n");
+
+    //  multiple user found
+    if (members.length > 1) {
+      return res.status(409).json({
+        success: false,
+        message: "Duplicate Entry Found",
+      });
+    }
+
+    // no user found
+    if (members.length < 1 || !members) {
       return res
         .status(404)
         .json({ success: false, message: "User Not Found !!!" });
     }
 
-    // 3  check if member is already in group
+    // let member = await validateUser(memberInfo);
 
+    let member = members[0];
+
+    // 3  check if member is already in group
     // find group
     const group = await Group.findByPk(groupId);
     const memberExist = await group.hasUser(member); // magic method --> boolean
@@ -88,30 +103,40 @@ const addNewMemberToGroup = async (req, res) => {
 // make member admin
 const createAdmin = async (req, res) => {
   try {
-    // get memberId & groupId from req
-    const { memberId, groupId } = req.body;
+    // 1 get memberId & groupId from req
+    const { memberInfo, groupId } = req.body;
 
-    // 1 check user is admin of group
-    const admin = await GroupMember.findOne({
-      where: { groupId, userId: req.user.id },
-    });
-
-    if (!admin) {
-      // unauthorized
-      return res
-        .status(401)
-        .json({ success: false, message: "You are not a admin of group" });
-    }
+    const where = {
+      [Op.or]: [
+        { name: memberInfo },
+        { email: memberInfo },
+        { phone: memberInfo },
+        { id: memberInfo },
+      ],
+    };
 
     // 2 find member
-    let member = await User.findByPk(memberId);
+    const members = await getUsers({ where });
 
-    if (!member) {
-      // invalid member id or user not found
+    console.log("\n\n\n", members, "\n\n\n");
+
+    //  multiple user found
+    if (members.length > 1) {
+      return res.status(409).json({
+        success: false,
+        message: "Duplicate Entry Found",
+      });
+    }
+
+    // no user found
+    if (members.length < 1 || !members) {
       return res
         .status(404)
         .json({ success: false, message: "User Not Found !!!" });
     }
+
+    // 2 find member
+    let member = members[0];
 
     // 3  check if member is already in group
 
@@ -127,7 +152,7 @@ const createAdmin = async (req, res) => {
     // if memberExist
     const newAdmin = await GroupMember.update(
       { isAdmin: true },
-      { where: { groupId, userId: memberId } }
+      { where: { groupId, userId: member.id } }
     );
 
     res.status(202).json({
@@ -144,19 +169,36 @@ const createAdmin = async (req, res) => {
 // remove user from group
 const removeMemberFromGroup = async (req, res) => {
   try {
-    // get memberId & groupId from req
-    const { memberId, groupId } = req.body;
+    // 1 get memberId & groupId from req
+    const { memberInfo, groupId } = req.body;
 
-    // 1 check user is admin of group
-    const admin = await GroupMember.findOne({
-      where: { groupId, userId: req.user.id },
-    });
+    const where = {
+      [Op.or]: [
+        { name: memberInfo },
+        { email: memberInfo },
+        { phone: memberInfo },
+        { id: memberInfo },
+      ],
+    };
 
-    if (!admin) {
-      // unauthorized
+    // 2 find member
+    const members = await getUsers({ where });
+
+    console.log("\n\n\n", members, "\n\n\n");
+
+    //  multiple user found
+    if (members.length > 1) {
+      return res.status(409).json({
+        success: false,
+        message: "Duplicate Entry Found",
+      });
+    }
+
+    // no user found
+    if (members.length < 1 || !members) {
       return res
-        .status(401)
-        .json({ success: false, message: "You are not a admin of group" });
+        .status(404)
+        .json({ success: false, message: "User Not Found !!!" });
     }
 
     // find member in group
@@ -165,7 +207,7 @@ const removeMemberFromGroup = async (req, res) => {
     const member = await GroupMember.destroy({
       where: {
         groupId,
-        userId: memberId,
+        userId: members[0].id,
       },
     });
 
@@ -220,3 +262,43 @@ module.exports = {
   addNewMemberToGroup,
   removeMemberFromGroup,
 };
+
+// member validator function
+/*
+async function validateUser(memberInfo) {
+  try {
+    const where = {
+      [Op.or]: [
+        { name: memberInfo },
+        { email: memberInfo },
+        { phone: memberInfo },
+      ],
+    };
+
+    // 2 find member
+    const members = await getUsers({ where });
+
+    console.log("\n\n\n", members, "\n\n\n");
+
+    //  multiple user found
+    if (members.length > 1) {
+      return res.status(409).json({
+        success: false,
+        message: "Duplicate Entry Found",
+      });
+    }
+
+    // no user found
+    if (members.length < 1 || !members) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User Not Found !!!" });
+    }
+
+    return members[0];
+  } catch (error) {
+    return new Error(error);
+  }
+}
+
+*/

@@ -11,13 +11,7 @@ const {
   removeMemberFromGroup,
 } = require("../controllers/groupAdmin");
 
-const { authentication } = require("../middlewares/auth");
-
-// create group
-router.post("/create", authentication, createNewGroup);
-
-// add member
-router.post("/addmember", authentication, addNewMemberToGroup);
+const { authentication, groupAdminAuth } = require("../middlewares/auth");
 
 // get user groups
 router.get("/all", authentication, getUserGroups);
@@ -25,10 +19,21 @@ router.get("/all", authentication, getUserGroups);
 // get admin groups
 router.get("/admingroups", authentication, getAdminGroups);
 
+// create group
+router.post("/create", authentication, createNewGroup);
+
+// add member
+router.post("/addmember", authentication, groupAdminAuth, addNewMemberToGroup);
+
 // make admin
-router.post("/assignAdmin", authentication, createAdmin);
+router.post("/assignAdmin", authentication, groupAdminAuth, createAdmin);
 
 // remove member
-router.delete("/removeMember", authentication, removeMemberFromGroup);
+router.delete(
+  "/removeMember",
+  authentication,
+  groupAdminAuth,
+  removeMemberFromGroup
+);
 
 module.exports = router;

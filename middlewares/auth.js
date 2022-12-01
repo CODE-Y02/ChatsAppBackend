@@ -7,6 +7,7 @@ dotenv.config();
 
 // jwt
 const jwt = require("jsonwebtoken");
+const GroupMember = require("../models/groupMembers");
 const User = require("../models/user");
 
 const authentication = async (req, res, next) => {
@@ -28,23 +29,31 @@ const authentication = async (req, res, next) => {
   }
 };
 
-// const isGroupAdminAuth = async (req, res, next) => {
-//   try {
-//     let admin = req.user;
+const groupAdminAuth = async (req, res, next) => {
+  try {
+    const { groupId } = req.body;
 
-//     let where = req.body.groupId
-//       ? { id: groupId, isAdmin: true, userId: admin.id }
-//       : { };
-//     let group = await admin.getGroups(where);
+    // 1 check user is admin of group
+    const admin = await GroupMember.findOne({
+      where: { groupId, userId: req.user.id },
+    });
 
-//     if (!group || group.length === 0) {
-//       return res
-//         .status(400)
-//         .json({ success: false, message: " You are not a admin" });
-//     }
-//   } catch (error) {}
-// };
+    if (!admin) {
+      // unauthorized
+      return res
+        .status(401)
+        .json({ success: false, message: "You are not a admin of group" });
+    }
+
+    // call next
+    next();
+  } catch (error) {
+    console.log(" \n ERR in AdminAuth  ", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
 
 module.exports = {
   authentication,
+  groupAdminAuth,
 };
