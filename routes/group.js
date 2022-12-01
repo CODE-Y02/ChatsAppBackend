@@ -8,6 +8,7 @@ const {
   getAdminGroups,
   createNewGroup,
   createAdmin,
+  removeMemberFromGroup,
 } = require("../controllers/groupAdmin");
 
 const { authentication } = require("../middlewares/auth");
@@ -26,5 +27,8 @@ router.get("/admingroups", authentication, getAdminGroups);
 
 // make admin
 router.post("/assignAdmin", authentication, createAdmin);
+
+// remove member
+router.delete("/removeMember", authentication, removeMemberFromGroup);
 
 module.exports = router;
