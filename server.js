@@ -45,7 +45,6 @@ app.use("/message", messageRoutes);
 app.use("/group", groupRoutes);
 
 // 404
-
 app.use("/", (req, res) => {
   res.status(404).json({ message: "Page NOt Founs !!!" });
 });
