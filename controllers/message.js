@@ -7,7 +7,7 @@ const { uploadToS3 } = require("../utils/s3services");
 // when user send msg
 const saveMsg = async (req, res, next) => {
   try {
-    const file = req.file;
+    const file = req.formdata;
 
     console.log("\n\n\n file =============> \n\n\n", file, "\n\n\n\n");
 
