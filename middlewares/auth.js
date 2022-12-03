@@ -12,7 +12,7 @@ const User = require("../models/user");
 
 const authentication = async (req, res, next) => {
   try {
-    // console.log("\n\n\n", req.headers, "\n\n\n");
+    // console.log("\n\n  req  \n", req, "\n\n\n");
     let token = req.headers.authorization;
 
     const userObj = jwt.verify(token, process.env.TOKEN_SECRET);

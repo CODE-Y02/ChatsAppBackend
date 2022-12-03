@@ -2,21 +2,38 @@ const { Op } = require("sequelize");
 
 const Message = require("../models/message");
 const User = require("../models/user");
+const { uploadToS3 } = require("../utils/s3services");
 
 // when user send msg
 const saveMsg = async (req, res, next) => {
   try {
-    const { message, groupId } = req.body;
+    const file = req.file;
+
+    console.log("\n\n\n file =============> \n\n\n", file, "\n\n\n\n");
 
     // console.log(req.body);
 
-    if (message === "") {
+    const { message, groupId } = req.body;
+
+    if (message === "" && !file) {
       //message cannot be null
       return res.status(400).json({
         success: false,
         error: "Bad Request",
-        message: "Message cannot be Blank",
+        message: "Message or file cannot be Blank",
       });
+    }
+
+    // if file is passed save file to s3 and get file url from there
+    let fileUrl;
+    if (file) {
+      console.log("\n\n\n file =============> \n\n\n", req, "\n\n\n\n");
+
+      // fileName format --> UserId /  filname=> "fileDate  . fileExtension "
+      const fileName = `File_${req.user.id}/${new Date()}`;
+      // fileUrl = await uploadToS3(file, fileName);
+
+      // return res.end();
     }
 
     let msg;
