@@ -7,13 +7,21 @@ const { uploadToS3 } = require("../utils/s3services");
 // when user send msg
 const saveMsg = async (req, res, next) => {
   try {
-    const file = req.formdata;
+    const { file, message } = req;
+    // const file = req;
+    console.log(req);
 
-    console.log("\n\n\n file =============> \n\n\n", file, "\n\n\n\n");
+    res.json({ "original req": req });
 
-    // console.log(req.body);
+    // console.log("\n\n\n formdata =============> \n\n\n", formData, "\n\n\n\n");
+    // console.log(
+    //   "\n\n\n message  =============> \n\n\n",
+    //   message,
+    //   groupId,
+    //   "\n\n\n\n"
+    // );
 
-    const { message, groupId } = req.body;
+    return;
 
     if (message === "" && !file) {
       //message cannot be null
@@ -27,7 +35,7 @@ const saveMsg = async (req, res, next) => {
     // if file is passed save file to s3 and get file url from there
     let fileUrl;
     if (file) {
-      console.log("\n\n\n file =============> \n\n\n", req, "\n\n\n\n");
+      // console.log("\n\n\n file =============> \n\n\n", req, "\n\n\n\n");
 
       // fileName format --> UserId /  filname=> "fileDate  . fileExtension "
       const fileName = `File_${req.user.id}/${new Date()}`;

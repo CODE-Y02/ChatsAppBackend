@@ -1,4 +1,6 @@
 const express = require("express");
+// const multer = require("multer");
+
 const sequelize = require("./utils/database");
 const cors = require("cors");
 
