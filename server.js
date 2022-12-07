@@ -1,12 +1,10 @@
 const express = require("express");
-// const multer = require("multer");
-
-const sequelize = require("./utils/database");
 const cors = require("cors");
 
 const dotenv = require("dotenv");
-
 dotenv.config();
+
+const sequelize = require("./utils/database");
 
 const app = express();
 
@@ -38,8 +36,23 @@ const userRoutes = require("./routes/user");
 const messageRoutes = require("./routes/message");
 const groupRoutes = require("./routes/group");
 
+// multer
+const multer = require("multer");
+
+// const upload = multer();
+
 // user route
 app.use(userRoutes);
+
+const upload = multer({ dest: "./public/data/uploads/" });
+
+app.use("/message", upload.single("file"), function (req, res, next) {
+  console.log("file ======> ", req.file);
+
+  // console.log("body ====> ", req.body);
+  next();
+});
+
 //message route
 app.use("/message", messageRoutes);
 
@@ -49,7 +62,7 @@ app.use("/group", groupRoutes);
 // 404
 
 app.use("/", (req, res) => {
-  res.status(404).json({ message: "Page NOt Founs !!!" });
+  res.status(404).json({ message: "Page NOt Found !!!" });
 });
 
 // start server function
@@ -68,7 +81,7 @@ const startApp = async () => {
       );
     });
   } catch (error) {
-    console.log("\n \n \n \n ");
+    console.log("\n \n error in server start =======> \n \n ");
     console.log({ errorMsg: error.message, error });
     console.log("\n \n \n \n ");
   }

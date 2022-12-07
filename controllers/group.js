@@ -13,7 +13,7 @@ const getUserGroups = async (req, res) => {
 
     res.json(groups);
   } catch (error) {
-    console.log("\n\n ===============>\n", error, "\n\n\n");
+    console.log("\n\n getUserGroups   =======>   \n\n", error, "\n\n\n");
 
     res.status(500).json(error);
   }

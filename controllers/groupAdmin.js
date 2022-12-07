@@ -94,7 +94,7 @@ const addNewMemberToGroup = async (req, res) => {
       message: `${member.name} added to ${group.name} group`,
     });
   } catch (error) {
-    console.log("\n\n\n", error, "\n\n\n");
+    console.log("\n\n \n  addNewMemberToGroup \n\n\n", error, "\n\n\n");
 
     res.status(500).json(error);
   }
@@ -161,7 +161,7 @@ const createAdmin = async (req, res) => {
       newAdmin,
     });
   } catch (error) {
-    console.log("\n\n\n", error, "\n\n\n");
+    console.log("\n\n createAdmin \n\n", error, "\n\n\n");
     res.json(error);
   }
 };
@@ -247,7 +247,7 @@ const getAdminGroups = async (req, res) => {
 
     res.status(200).json(groups);
   } catch (error) {
-    console.log("\n\n ===============>\n", error, "\n\n\n");
+    console.log("\n\n  getAdminGroups  =====>\n\n", error, "\n\n\n");
 
     res.status(500).json(error);
   }
@@ -262,43 +262,3 @@ module.exports = {
   addNewMemberToGroup,
   removeMemberFromGroup,
 };
-
-// member validator function
-/*
-async function validateUser(memberInfo) {
-  try {
-    const where = {
-      [Op.or]: [
-        { name: memberInfo },
-        { email: memberInfo },
-        { phone: memberInfo },
-      ],
-    };
-
-    // 2 find member
-    const members = await getUsers({ where });
-
-    console.log("\n\n\n", members, "\n\n\n");
-
-    //  multiple user found
-    if (members.length > 1) {
-      return res.status(409).json({
-        success: false,
-        message: "Duplicate Entry Found",
-      });
-    }
-
-    // no user found
-    if (members.length < 1 || !members) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User Not Found !!!" });
-    }
-
-    return members[0];
-  } catch (error) {
-    return new Error(error);
-  }
-}
-
-*/

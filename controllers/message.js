@@ -1,4 +1,5 @@
 const { Op } = require("sequelize");
+const fs = require("fs");
 
 const Message = require("../models/message");
 const User = require("../models/user");
@@ -7,23 +8,13 @@ const { uploadToS3 } = require("../utils/s3services");
 // when user send msg
 const saveMsg = async (req, res, next) => {
   try {
-    const { file, message } = req;
-    // const file = req;
-    console.log(req);
+    const { file } = req;
 
-    res.json({ "original req": req });
+    let { message, groupId } = req.body;
 
-    // console.log("\n\n\n formdata =============> \n\n\n", formData, "\n\n\n\n");
-    // console.log(
-    //   "\n\n\n message  =============> \n\n\n",
-    //   message,
-    //   groupId,
-    //   "\n\n\n\n"
-    // );
+    groupId = Number(groupId);
 
-    return;
-
-    if (message === "" && !file) {
+    if (!message && !file) {
       //message cannot be null
       return res.status(400).json({
         success: false,
@@ -35,28 +26,28 @@ const saveMsg = async (req, res, next) => {
     // if file is passed save file to s3 and get file url from there
     let fileUrl;
     if (file) {
-      // console.log("\n\n\n file =============> \n\n\n", req, "\n\n\n\n");
+      let readyFile = fs.readFileSync(file.path);
+      // console.log("\n\n\n file =============> \n\n\n", file, "\n\n\n\n");
 
       // fileName format --> UserId /  filname=> "fileDate  . fileExtension "
-      const fileName = `File_${req.user.id}/${new Date()}`;
-      // fileUrl = await uploadToS3(file, fileName);
-
-      // return res.end();
+      const fileName = `File_${req.user.id}/${new Date()}/${file.originalname}`;
+      fileUrl = await uploadToS3(readyFile, fileName);
     }
 
-    let msg;
-
-    if (groupId) {
-      msg = await req.user.createMessage({
-        content: message,
-        groupId,
-      });
-    } else {
-      msg = await req.user.createMessage({
-        content: message,
-        // senderName: req.user.name,
-      });
-    }
+    let msg = await req.user.createMessage({
+      content: message,
+      fileUrl,
+      groupId,
+    });
+    // if (message && !groupId) {
+    //   msg = await req.user.createMessage({ content: message, fileUrl });
+    // } else {
+    //   msg = await req.user.createMessage({
+    //     content: message,
+    //     fileUrl,
+    //     groupId,
+    //   });
+    // }
 
     // once msg is stored in DB send response to user msg send
     res.status(201).json({
@@ -64,6 +55,15 @@ const saveMsg = async (req, res, next) => {
       message: "Message send successfully",
       msg,
     });
+
+    // clean up file from sperver
+    if (file) {
+      fs.unlink(file.path, (err) => {
+        if (err) console.log("error in deleting file from ", file.path, "\n\n");
+      });
+
+      // clean up action ends
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json({
@@ -98,12 +98,12 @@ const getAllmsg = async (req, res, next) => {
     // get user name for each msg and clean up response
     msgArr = await msgArr.map(async (each) => {
       let user = await each.getUser();
-      const { createdAt, content, updatedAt, id } = each;
+      const { createdAt, content, updatedAt, id, fileUrl } = each;
 
       let name = user.name;
       if (user.id === req.user.id) name = "you";
 
-      return { id, content, updatedAt, createdAt, name };
+      return { id, content, updatedAt, createdAt, name, fileUrl };
     });
 
     let messages = await Promise.all(msgArr);
@@ -145,12 +145,12 @@ const getGroupMsg = async (req, res, next) => {
     // get user name for each msg and clean up response
     msgArr = await msgArr.map(async (each) => {
       let user = await each.getUser();
-      const { createdAt, content, updatedAt, id } = each;
+      const { createdAt, content, updatedAt, id, fileUrl } = each;
 
       let name = user.name;
       if (user.id === req.user.id) name = "you";
 
-      return { id, content, updatedAt, createdAt, name };
+      return { id, content, updatedAt, createdAt, name, fileUrl };
     });
 
     let messages = await Promise.all(msgArr);

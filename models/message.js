@@ -12,7 +12,7 @@ const Message = sequelize.define("message", {
 
   content: {
     type: Sequelize.STRING,
-    allowNull: false,
+    allowNull: true,
   },
 
   fileUrl: Sequelize.STRING,

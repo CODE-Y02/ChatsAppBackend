@@ -48,7 +48,7 @@ const groupAdminAuth = async (req, res, next) => {
     // call next
     next();
   } catch (error) {
-    console.log(" \n ERR in AdminAuth  ", error);
+    console.log(" \n ERR in Admin Auth  ", error);
     return res.status(500).json({ success: false, message: error.message });
   }
 };

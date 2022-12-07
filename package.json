@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/CODE-Y02/ChatsAppBackend#readme",
   "dependencies": {
-    "aws-sdk": "^2.1266.0",
+    "aws-sdk": "^2.1268.0",
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.1",
     "cors": "^2.8.5",
