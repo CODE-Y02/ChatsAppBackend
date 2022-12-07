@@ -47,7 +47,7 @@ app.use(userRoutes);
 const upload = multer({ dest: "./public/data/uploads/" });
 
 app.use("/message", upload.single("file"), function (req, res, next) {
-  console.log("file ======> ", req.file);
+  // console.log("file ======> ", req.file);
 
   // console.log("body ====> ", req.body);
   next();

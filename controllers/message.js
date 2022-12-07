@@ -2,7 +2,7 @@ const { Op } = require("sequelize");
 const fs = require("fs");
 
 const Message = require("../models/message");
-const User = require("../models/user");
+
 const { uploadToS3 } = require("../utils/s3services");
 
 // when user send msg
@@ -27,27 +27,19 @@ const saveMsg = async (req, res, next) => {
     let fileUrl;
     if (file) {
       let readyFile = fs.readFileSync(file.path);
-      // console.log("\n\n\n file =============> \n\n\n", file, "\n\n\n\n");
 
       // fileName format --> UserId /  filname=> "fileDate  . fileExtension "
       const fileName = `File_${req.user.id}/${new Date()}/${file.originalname}`;
+
       fileUrl = await uploadToS3(readyFile, fileName);
     }
 
+    // create msg in db
     let msg = await req.user.createMessage({
       content: message,
       fileUrl,
       groupId,
     });
-    // if (message && !groupId) {
-    //   msg = await req.user.createMessage({ content: message, fileUrl });
-    // } else {
-    //   msg = await req.user.createMessage({
-    //     content: message,
-    //     fileUrl,
-    //     groupId,
-    //   });
-    // }
 
     // once msg is stored in DB send response to user msg send
     res.status(201).json({
@@ -126,8 +118,6 @@ const getGroupMsg = async (req, res, next) => {
 
     const groupId = req.params.id;
 
-    console.log("\n\n  messages=====>  \n", groupId, "\n\n");
-
     if (!lastMsgId && lastMsgId !== 0) {
       lastMsgId = -1;
     }
@@ -154,7 +144,7 @@ const getGroupMsg = async (req, res, next) => {
     });
 
     let messages = await Promise.all(msgArr);
-    // console.log("\n\n  messages=====>  \n", messages, "\n\n");
+
     res.status(200).json(messages);
   } catch (error) {
     console.log("\n\n error in get ALL msg \n", error, "\n\n");
