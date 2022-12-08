@@ -87,4 +87,9 @@ const startApp = async () => {
   }
 };
 
+//cron job
+const { archiveMessage } = require("./services/cleanUp");
+
 startApp();
+
+archiveMessage();

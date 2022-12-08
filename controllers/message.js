@@ -31,7 +31,7 @@ const saveMsg = async (req, res, next) => {
       // fileName format --> UserId /  filname=> "fileDate  . fileExtension "
       const fileName = `File_${req.user.id}/${new Date()}/${file.originalname}`;
 
-      fileUrl = await uploadToS3(readyFile, fileName);
+      // fileUrl = await uploadToS3(readyFile, fileName);
     }
 
     // create msg in db
